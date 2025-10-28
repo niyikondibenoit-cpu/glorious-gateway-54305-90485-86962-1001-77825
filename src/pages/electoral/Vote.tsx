@@ -234,22 +234,7 @@ export default function Vote() {
           streams: { name: streamResult.data?.name || 'Unknown' }
         });
 
-        // Check if student has already voted
-        const { data: existingVotes, error: votesError } = await supabase
-          .from('electoral_votes')
-          .select('id')
-          .eq('voter_id', user.id)
-          .limit(1);
-
-        if (votesError) throw votesError;
-
-        if (existingVotes && existingVotes.length > 0) {
-          setHasAlreadyVoted(true);
-          setLoading(false);
-          return;
-        }
-
-        // Fetch active positions
+        // Fetch active positions first to know total count
         const { data: positionsData, error: positionsError } = await supabase
           .from('electoral_positions')
           .select('*')
@@ -257,6 +242,35 @@ export default function Vote() {
           .order('title');
 
         if (positionsError) throw positionsError;
+
+        // Check if student has completed voting - only if they voted for ALL positions
+        // OR if they have the completion flag in session storage
+        const hasCompletionFlag = sessionStorage.getItem(`voteSubmitted_${user.id}`) === 'true';
+        
+        if (hasCompletionFlag) {
+          setHasAlreadyVoted(true);
+          setLoading(false);
+          return;
+        }
+
+        // Check database votes - only consider complete if they voted for all positions
+        const { data: existingVotes, error: votesError } = await supabase
+          .from('electoral_votes')
+          .select('position')
+          .eq('voter_id', user.id);
+
+        if (votesError) throw votesError;
+
+        const totalPositions = positionsData?.length || 0;
+        const votedPositionsCount = existingVotes?.length || 0;
+
+        // Only mark as "already voted" if they've completed ALL positions
+        if (votedPositionsCount > 0 && votedPositionsCount >= totalPositions) {
+          sessionStorage.setItem(`voteSubmitted_${user.id}`, 'true');
+          setHasAlreadyVoted(true);
+          setLoading(false);
+          return;
+        }
 
         // Fetch confirmed candidates
         const { data: candidatesData, error: candidatesError } = await supabase
