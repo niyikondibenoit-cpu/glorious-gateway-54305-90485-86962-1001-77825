@@ -1,85 +1,126 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 const ElectoralResults = () => {
-  const [pages, setPages] = useState([]);
+  const [pages] = useState([
+    {
+      title: 'Presidential Election 2024',
+      candidates: [
+        { id: 1, name: 'Sarah Johnson', party: 'Progressive Party', votes: 45230, photo: 'https://i.pravatar.cc/150?img=1' },
+        { id: 2, name: 'Michael Chen', party: 'Unity Alliance', votes: 44800, photo: 'https://i.pravatar.cc/150?img=13' },
+        { id: 3, name: 'Emily Rodriguez', party: 'Democratic Front', votes: 44500, photo: 'https://i.pravatar.cc/150?img=5' },
+        { id: 4, name: 'James Wilson', party: 'Conservative Coalition', votes: 44200, photo: 'https://i.pravatar.cc/150?img=12' },
+        { id: 5, name: 'Aisha Patel', party: 'Green Movement', votes: 43900, photo: 'https://i.pravatar.cc/150?img=9' },
+        { id: 6, name: 'David Brown', party: 'Independent', votes: 43600, photo: 'https://i.pravatar.cc/150?img=15' }
+      ]
+    },
+    {
+      title: 'Senate Race - District A',
+      candidates: [
+        { id: 7, name: 'Linda Martinez', party: 'Progressive Party', votes: 38500, photo: 'https://i.pravatar.cc/150?img=20' },
+        { id: 8, name: 'Robert Kim', party: 'Unity Alliance', votes: 37800, photo: 'https://i.pravatar.cc/150?img=33' },
+        { id: 9, name: 'Jennifer Taylor', party: 'Democratic Front', votes: 36900, photo: 'https://i.pravatar.cc/150?img=24' },
+        { id: 10, name: 'Thomas Anderson', party: 'Conservative Coalition', votes: 35700, photo: 'https://i.pravatar.cc/150?img=31' },
+        { id: 11, name: 'Maya Singh', party: 'Green Movement', votes: 34800, photo: 'https://i.pravatar.cc/150?img=29' },
+        { id: 12, name: 'Christopher Lee', party: 'Independent', votes: 33500, photo: 'https://i.pravatar.cc/150?img=52' }
+      ]
+    },
+    {
+      title: 'Gubernatorial Election - State B',
+      candidates: [
+        { id: 13, name: 'Patricia O\'Brien', party: 'Progressive Party', votes: 52400, photo: 'https://i.pravatar.cc/150?img=47' },
+        { id: 14, name: 'Daniel Wu', party: 'Unity Alliance', votes: 51200, photo: 'https://i.pravatar.cc/150?img=59' },
+        { id: 15, name: 'Amanda Garcia', party: 'Democratic Front', votes: 49800, photo: 'https://i.pravatar.cc/150?img=45' },
+        { id: 16, name: 'Marcus Thompson', party: 'Conservative Coalition', votes: 48500, photo: 'https://i.pravatar.cc/150?img=54' },
+        { id: 17, name: 'Sophia Kumar', party: 'Green Movement', votes: 47300, photo: 'https://i.pravatar.cc/150?img=44' },
+        { id: 18, name: 'Nathan Clark', party: 'Independent', votes: 45900, photo: 'https://i.pravatar.cc/150?img=68' }
+      ]
+    },
+    {
+      title: 'Mayoral Race - City Center',
+      candidates: [
+        { id: 19, name: 'Rachel Green', party: 'Progressive Party', votes: 28700, photo: 'https://i.pravatar.cc/150?img=10' },
+        { id: 20, name: 'Kevin Park', party: 'Unity Alliance', votes: 27900, photo: 'https://i.pravatar.cc/150?img=60' },
+        { id: 21, name: 'Lisa Chen', party: 'Democratic Front', votes: 26800, photo: 'https://i.pravatar.cc/150?img=32' },
+        { id: 22, name: 'Brian Davis', party: 'Conservative Coalition', votes: 25600, photo: 'https://i.pravatar.cc/150?img=56' },
+        { id: 23, name: 'Priya Sharma', party: 'Green Movement', votes: 24500, photo: 'https://i.pravatar.cc/150?img=41' },
+        { id: 24, name: 'Alex Martinez', party: 'Independent', votes: 23400, photo: 'https://i.pravatar.cc/150?img=58' }
+      ]
+    },
+    {
+      title: 'County Commissioner - Region 5',
+      candidates: [
+        { id: 25, name: 'Michelle White', party: 'Progressive Party', votes: 19200, photo: 'https://i.pravatar.cc/150?img=26' },
+        { id: 26, name: 'Steven Nguyen', party: 'Unity Alliance', votes: 18700, photo: 'https://i.pravatar.cc/150?img=61' },
+        { id: 27, name: 'Diana Lopez', party: 'Democratic Front', votes: 17900, photo: 'https://i.pravatar.cc/150?img=38' },
+        { id: 28, name: 'Gregory Hall', party: 'Conservative Coalition', votes: 17200, photo: 'https://i.pravatar.cc/150?img=55' },
+        { id: 29, name: 'Fatima Ali', party: 'Green Movement', votes: 16500, photo: 'https://i.pravatar.cc/150?img=43' },
+        { id: 30, name: 'Timothy Moore', party: 'Independent', votes: 15800, photo: 'https://i.pravatar.cc/150?img=67' }
+      ]
+    },
+    {
+      title: 'State Assembly - District 12',
+      candidates: [
+        { id: 31, name: 'Angela Scott', party: 'Progressive Party', votes: 31500, photo: 'https://i.pravatar.cc/150?img=27' },
+        { id: 32, name: 'Richard Zhang', party: 'Unity Alliance', votes: 30800, photo: 'https://i.pravatar.cc/150?img=62' },
+        { id: 33, name: 'Rebecca Johnson', party: 'Democratic Front', votes: 29700, photo: 'https://i.pravatar.cc/150?img=39' },
+        { id: 34, name: 'Charles Bennett', party: 'Conservative Coalition', votes: 28900, photo: 'https://i.pravatar.cc/150?img=57' },
+        { id: 35, name: 'Zara Hassan', party: 'Green Movement', votes: 27800, photo: 'https://i.pravatar.cc/150?img=48' },
+        { id: 36, name: 'Jason Rivera', party: 'Independent', votes: 26700, photo: 'https://i.pravatar.cc/150?img=69' }
+      ]
+    },
+    {
+      title: 'School Board Election',
+      candidates: [
+        { id: 37, name: 'Victoria Adams', party: 'Progressive Party', votes: 22400, photo: 'https://i.pravatar.cc/150?img=25' },
+        { id: 38, name: 'Andrew Patel', party: 'Unity Alliance', votes: 21800, photo: 'https://i.pravatar.cc/150?img=63' },
+        { id: 39, name: 'Maria Sanchez', party: 'Democratic Front', votes: 20900, photo: 'https://i.pravatar.cc/150?img=40' },
+        { id: 40, name: 'William Turner', party: 'Conservative Coalition', votes: 20100, photo: 'https://i.pravatar.cc/150?img=53' },
+        { id: 41, name: 'Layla Ahmed', party: 'Green Movement', votes: 19300, photo: 'https://i.pravatar.cc/150?img=42' },
+        { id: 42, name: 'Jordan Collins', party: 'Independent', votes: 18500, photo: 'https://i.pravatar.cc/150?img=66' }
+      ]
+    },
+    {
+      title: 'City Council - Ward 3',
+      candidates: [
+        { id: 43, name: 'Olivia Brooks', party: 'Progressive Party', votes: 15600, photo: 'https://i.pravatar.cc/150?img=28' },
+        { id: 44, name: 'Henry Tanaka', party: 'Unity Alliance', votes: 15100, photo: 'https://i.pravatar.cc/150?img=64' },
+        { id: 45, name: 'Carmen Diaz', party: 'Democratic Front', votes: 14500, photo: 'https://i.pravatar.cc/150?img=36' },
+        { id: 46, name: 'Paul Mitchell', party: 'Conservative Coalition', votes: 13900, photo: 'https://i.pravatar.cc/150?img=51' },
+        { id: 47, name: 'Amina Ibrahim', party: 'Green Movement', votes: 13200, photo: 'https://i.pravatar.cc/150?img=46' },
+        { id: 48, name: 'Eric Phillips', party: 'Independent', votes: 12600, photo: 'https://i.pravatar.cc/150?img=65' }
+      ]
+    },
+    {
+      title: 'State Treasurer Election',
+      candidates: [
+        { id: 49, name: 'Catherine Hayes', party: 'Progressive Party', votes: 41300, photo: 'https://i.pravatar.cc/150?img=21' },
+        { id: 50, name: 'Samuel Choi', party: 'Unity Alliance', votes: 40600, photo: 'https://i.pravatar.cc/150?img=70' },
+        { id: 51, name: 'Nicole Foster', party: 'Democratic Front', votes: 39400, photo: 'https://i.pravatar.cc/150?img=35' },
+        { id: 52, name: 'Donald Hughes', party: 'Conservative Coalition', votes: 38200, photo: 'https://i.pravatar.cc/150?img=50' },
+        { id: 53, name: 'Yasmin Rahman', party: 'Green Movement', votes: 37100, photo: 'https://i.pravatar.cc/150?img=49' },
+        { id: 54, name: 'Keith Warren', party: 'Independent', votes: 35900, photo: 'https://i.pravatar.cc/150?img=71' }
+      ]
+    },
+    {
+      title: 'Attorney General Race',
+      candidates: [
+        { id: 55, name: 'Elizabeth King', party: 'Progressive Party', votes: 48900, photo: 'https://i.pravatar.cc/150?img=23' },
+        { id: 56, name: 'Raymond Lin', party: 'Unity Alliance', votes: 47700, photo: 'https://i.pravatar.cc/150?img=72' },
+        { id: 57, name: 'Stephanie Powell', party: 'Democratic Front', votes: 46500, photo: 'https://i.pravatar.cc/150?img=37' },
+        { id: 58, name: 'Jonathan Reed', party: 'Conservative Coalition', votes: 45300, photo: 'https://i.pravatar.cc/150?img=11' },
+        { id: 59, name: 'Nadia Khan', party: 'Green Movement', votes: 44100, photo: 'https://i.pravatar.cc/150?img=30' },
+        { id: 60, name: 'Vincent Gray', party: 'Independent', votes: 42800, photo: 'https://i.pravatar.cc/150?img=14' }
+      ]
+    }
+  ]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [candidatesData, setCandidatesData] = useState([]);
+  const [candidatesData, setCandidatesData] = useState(pages);
   const [voteChanges, setVoteChanges] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
   const autoScrollTimerRef = useRef(null);
   const touchStartXRef = useRef(0);
   const touchEndXRef = useRef(0);
-
-  // Load positions and candidates from database
-  useEffect(() => {
-    const loadElectoralData = async () => {
-      setIsLoading(true);
-      
-      // Fetch all votes to calculate totals
-      const { data: votesData } = await supabase
-        .from('electoral_votes')
-        .select('*');
-      
-      // Fetch all confirmed candidates with their positions
-      const { data: candidatesData } = await supabase
-        .from('electoral_applications')
-        .select('*')
-        .eq('status', 'confirmed')
-        .order('position');
-      
-      if (candidatesData && votesData) {
-        // Group candidates by position
-        const positionGroups = candidatesData.reduce((acc, candidate) => {
-          if (!acc[candidate.position]) {
-            acc[candidate.position] = [];
-          }
-          
-          // Count votes for this candidate
-          const candidateVotes = votesData.filter(
-            v => v.candidate_id === candidate.student_id && v.position === candidate.position
-          ).length;
-          
-          acc[candidate.position].push({
-            id: candidate.student_id,
-            name: candidate.student_name,
-            party: `${candidate.class_name} ${candidate.stream_name}` || 'Independent',
-            votes: candidateVotes,
-            photo: candidate.student_photo || 'https://i.pravatar.cc/150?img=1'
-          });
-          
-          return acc;
-        }, {});
-        
-        // Convert to pages array format
-        const pagesArray = Object.entries(positionGroups).map(([position, candidates]) => ({
-          title: position,
-          candidates: candidates
-        }));
-        
-        setPages(pagesArray);
-        setCandidatesData(pagesArray);
-      }
-      
-      setIsLoading(false);
-    };
-    
-    loadElectoralData();
-    
-    // Set up real-time subscription for vote updates
-    const channel = supabase
-      .channel('results-updates')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'electoral_votes' }, () => {
-        loadElectoralData();
-      })
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const transitions = [
     { in: 'slideInRight', out: 'slideOutLeft' },
@@ -92,6 +133,40 @@ const ElectoralResults = () => {
     { in: 'morphIn', out: 'morphOut' }
   ];
 
+  const simulateVoteUpdate = () => {
+    setCandidatesData(prevPages => {
+      return prevPages.map(page => {
+        const numCandidatesToUpdate = Math.floor(Math.random() * 3) + 1;
+        const updatedCandidates = [...page.candidates];
+        
+        for (let i = 0; i < numCandidatesToUpdate; i++) {
+          const randomIndex = Math.floor(Math.random() * updatedCandidates.length);
+          const voteIncrease = Math.floor(Math.random() * 2500) + 500;
+          const candidateId = updatedCandidates[randomIndex].id;
+          
+          updatedCandidates[randomIndex] = {
+            ...updatedCandidates[randomIndex],
+            votes: updatedCandidates[randomIndex].votes + voteIncrease
+          };
+          
+          setVoteChanges(prev => ({
+            ...prev,
+            [candidateId]: voteIncrease
+          }));
+          
+          setTimeout(() => {
+            setVoteChanges(prev => {
+              const newChanges = { ...prev };
+              delete newChanges[candidateId];
+              return newChanges;
+            });
+          }, 1000);
+        }
+        
+        return { ...page, candidates: updatedCandidates };
+      });
+    });
+  };
 
   const startAutoScroll = () => {
     if (autoScrollTimerRef.current) {
@@ -154,9 +229,8 @@ const ElectoralResults = () => {
   };
 
   useEffect(() => {
-    if (pages.length > 0) {
-      startAutoScroll();
-    }
+    startAutoScroll();
+    const voteUpdateInterval = setInterval(simulateVoteUpdate, 10000);
     
     window.addEventListener('keydown', handleKeyDown);
     
@@ -164,9 +238,10 @@ const ElectoralResults = () => {
       if (autoScrollTimerRef.current) {
         clearInterval(autoScrollTimerRef.current);
       }
+      clearInterval(voteUpdateInterval);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentPage, pages.length]);
+  }, [currentPage]);
 
   const CandidateCard = ({ candidate, position, pageIndex }) => {
     const [displayVotes, setDisplayVotes] = useState(0);
@@ -223,33 +298,16 @@ const ElectoralResults = () => {
     );
   };
 
-  if (isLoading || pages.length === 0) {
-    return (
-      <div style={{ 
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: '#fff'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
-          <p>Loading electoral results...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div 
       style={{ 
         margin: 0,
-        padding: '20px',
+        padding: 0,
         boxSizing: 'border-box',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         minHeight: '100vh',
+        padding: '20px',
         color: '#fff',
         overflowX: 'hidden'
       }}
