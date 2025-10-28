@@ -274,14 +274,26 @@ export default function Vote() {
           description: pos.description || '',
           candidates: (candidatesData || [])
             .filter(app => app.position === pos.id && app.id !== null && app.id !== undefined)
-            .map(app => ({
-              id: app.id!,
-              name: app.student_name!,
-              email: app.student_email!,
-              photo: app.student_photo,
-              class: app.class_name!,
-              stream: app.stream_name!
-            }))
+            .map(app => {
+              // Manually set photos for specific candidates
+              let photo = app.student_photo;
+              const name = app.student_name?.toUpperCase() || '';
+              
+              if (name.includes('JANAT') || name.includes('KALIBBALA')) {
+                photo = '/janat.jpg';
+              } else if (name.includes('SHANNAH') || name.includes('NAKASUJJA')) {
+                photo = '/shannah.jpg';
+              }
+              
+              return {
+                id: app.id!,
+                name: app.student_name!,
+                email: app.student_email!,
+                photo: photo,
+                class: app.class_name!,
+                stream: app.stream_name!
+              };
+            })
         })).filter(pos => pos.candidates.length > 0); // Only show positions with candidates
         
         setPositions(positionsWithCandidates);

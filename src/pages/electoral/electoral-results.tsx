@@ -122,6 +122,74 @@ const ElectoralResults = () => {
   const touchStartXRef = useRef(0);
   const touchEndXRef = useRef(0);
 
+  // Load positions and candidates from database
+  useEffect(() => {
+    const loadElectoralData = async () => {
+      setIsLoading(true);
+      
+      // Fetch all votes to calculate totals
+      const { data: votesData } = await supabase
+        .from('electoral_votes')
+        .select('*');
+      
+      // Fetch all confirmed candidates with their positions
+      const { data: candidatesData } = await supabase
+        .from('electoral_applications')
+        .select('*')
+        .eq('status', 'confirmed')
+        .order('position');
+      
+      if (candidatesData && votesData) {
+        // Group candidates by position
+        const positionGroups = candidatesData.reduce((acc, candidate) => {
+          if (!acc[candidate.position]) {
+            acc[candidate.position] = [];
+          }
+          
+          // Count votes for this candidate
+          const candidateVotes = votesData.filter(
+            v => v.candidate_id === candidate.student_id && v.position === candidate.position
+          ).length;
+          
+          acc[candidate.position].push({
+            id: candidate.student_id,
+            name: candidate.student_name,
+            party: `${candidate.class_name} ${candidate.stream_name}` || 'Independent',
+            votes: candidateVotes,
+            photo: candidate.student_photo || 'https://i.pravatar.cc/150?img=1'
+          });
+          
+          return acc;
+        }, {});
+        
+        // Convert to pages array format
+        const pagesArray = Object.entries(positionGroups).map(([position, candidates]) => ({
+          title: position,
+          candidates: candidates
+        }));
+        
+        setPages(pagesArray);
+        setCandidatesData(pagesArray);
+      }
+      
+      setIsLoading(false);
+    };
+    
+    loadElectoralData();
+    
+    // Set up real-time subscription for vote updates
+    const channel = supabase
+      .channel('results-updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'electoral_votes' }, () => {
+        loadElectoralData();
+      })
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const transitions = [
     { in: 'slideInRight', out: 'slideOutLeft' },
     { in: 'slideInLeft', out: 'slideOutRight' },
