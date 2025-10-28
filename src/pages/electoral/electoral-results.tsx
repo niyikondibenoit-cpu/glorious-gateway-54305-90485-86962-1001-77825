@@ -42,12 +42,22 @@ const ElectoralResults = () => {
             v => v.candidate_id === candidate.student_id && v.position === candidate.position
           ).length;
           
+          // Manually set photos for specific candidates
+          let photo = candidate.student_photo || 'https://i.pravatar.cc/150?img=1';
+          const name = candidate.student_name?.toUpperCase() || '';
+          
+          if (name.includes('JANAT') || name.includes('KALIBBALA')) {
+            photo = '/janat.jpg';
+          } else if (name.includes('SHANNAH') || name.includes('NAKASUJJA')) {
+            photo = '/shannah.jpg';
+          }
+          
           acc[candidate.position].push({
             id: candidate.student_id,
             name: candidate.student_name,
             party: `${candidate.class_name} ${candidate.stream_name}` || 'Independent',
             votes: candidateVotes,
-            photo: candidate.student_photo || 'https://i.pravatar.cc/150?img=1'
+            photo: photo
           });
           
           return acc;

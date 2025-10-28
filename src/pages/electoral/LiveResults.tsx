@@ -173,6 +173,16 @@ export default function LiveResults() {
         const candidates: ResultCandidate[] = positionCandidates.map((candidate, index) => {
           const voteCount = voteCounts[candidate.id!] || 0;
           
+          // Manually set photos for specific candidates
+          let photo = candidate.student_photo;
+          const name = candidate.student_name?.toUpperCase() || '';
+          
+          if (name.includes('JANAT') || name.includes('KALIBBALA')) {
+            photo = '/janat.jpg';
+          } else if (name.includes('SHANNAH') || name.includes('NAKASUJJA')) {
+            photo = '/shannah.jpg';
+          }
+          
           return {
             id: candidate.id!,
             name: candidate.student_name!,
@@ -180,7 +190,7 @@ export default function LiveResults() {
             stream: candidate.stream_name!,
             votes: voteCount,
             percentage: 0, // Will calculate after we know total
-            photo: candidate.student_photo
+            photo: photo
           };
         }).sort((a, b) => b.votes - a.votes);
         
