@@ -101,23 +101,38 @@ export function BallotContainer({
 
   // Restore session if available (user-specific)
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || positions.length === 0) return;
     
     const savedData = sessionStorage.getItem(`ballotData_${userId}`);
     if (savedData) {
       try {
         const data = JSON.parse(savedData);
-        setSelections(data.selections || {});
-        setLocked(data.locked || {});
         
-        const unvotedIndex = positions.findIndex(pos => !data.selections[pos.id]);
+        // Only restore selections that match CURRENT positions (in case positions were filtered)
+        const validSelections: Record<string, string> = {};
+        const validLocked: Record<string, boolean> = {};
+        
+        positions.forEach(pos => {
+          if (data.selections?.[pos.id]) {
+            validSelections[pos.id] = data.selections[pos.id];
+            validLocked[pos.id] = data.locked?.[pos.id] || false;
+          }
+        });
+        
+        setSelections(validSelections);
+        setLocked(validLocked);
+        
+        // Find first unvoted position
+        const unvotedIndex = positions.findIndex(pos => !validSelections[pos.id]);
         if (unvotedIndex !== -1) {
           setCurrentPositionIndex(unvotedIndex);
-        } else if (Object.keys(data.selections).length === positions.length) {
+        } else if (Object.keys(validSelections).length === positions.length) {
           setShowReview(true);
         }
       } catch (e) {
         console.error('Failed to restore session:', e);
+        // Clear corrupted session data
+        sessionStorage.removeItem(`ballotData_${userId}`);
       }
     }
   }, [positions, userId]);
